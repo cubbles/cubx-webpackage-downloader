@@ -1,0 +1,26 @@
+{
+  "name": "cubx-webpackage-downloader",
+  "version": "1.0.0",
+  "description": "Downloads a list of cubbles webpackages",
+  "main": "cubx-webpackage-downloader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cubbles/cubx-webpackage-downloader.git"
+  },
+  "keywords": [
+    "webpackage",
+    "download",
+    "cubbles",
+    "resoorces",
+    "offline"
+  ],
+  "author": "Edwin Gamboa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cubbles/cubx-webpackage-downloader/issues"
+  },
+  "homepage": "https://github.com/cubbles/cubx-webpackage-downloader#readme"
+}
