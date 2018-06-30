@@ -461,7 +461,7 @@
                   case 'propagateInvalidManifest':
                     manifest = 'invalidManifest';
                     break;
-                    case 'propagateInvalidArtifacts':
+                  case 'propagateInvalidArtifacts':
                     manifest = wpTwoManifestJson;
                     break;
                   case 'invalidWpId':
