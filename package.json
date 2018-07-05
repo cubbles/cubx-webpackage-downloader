@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Downloads a list of cubbles webpackages",
   "main": "lib/cubx-webpackage-downloader.js",
+  "bin": {
+    "cubx-webpackage-downloader": "./bin/cubx-webpackage-downloader.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -37,6 +40,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "command-line-args": "^5.0.2",
     "fs-extra": "^6.0.1",
     "is-valid-path": "^0.1.1",
     "path": "^0.12.7",
