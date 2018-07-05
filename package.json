@@ -38,6 +38,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "fs-extra": "^6.0.1",
-    "path": "^0.12.7"
+    "is-valid-path": "^0.1.1",
+    "path": "^0.12.7",
+    "valid-url": "^1.0.9"
   }
 }

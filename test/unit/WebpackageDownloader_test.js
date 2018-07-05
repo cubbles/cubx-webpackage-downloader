@@ -559,12 +559,14 @@
       let webpackageIdTwo;
       let wpManifestJson;
       let wpTwoManifestJson;
+      let listOfWps;
       before(function () {
         wpManifestJson = JSON.parse(wpManifest);
         wpTwoManifestJson = JSON.parse(wpTwoManifest);
         webpackageId = wpManifestJson.name + '@' + wpManifestJson.version;
         webpackageIdTwo = wpTwoManifestJson.name + '@' + wpTwoManifestJson.version;
         webpackageDownloader = new WebpackageDownloader();
+        listOfWps = [webpackageId, webpackageIdTwo];
       });
       beforeEach(function () {
         consoleSpy = sinon.spy(console, 'error');
@@ -590,7 +592,6 @@
         consoleSpy.restore();
       });
       it('should call _isValidListOfWebpackages and _downloadWebpackage and initialisation should be right', function (done) {
-        let listOfWps = [webpackageId, webpackageIdTwo];
         webpackageDownloader.downloadWebpackages(listOfWps, targetDirectory, baseUrl)
           .then(function () {
             expect(webpackageDownloader.targetDirectory).to.be.equal(targetDirectory);
@@ -616,6 +617,22 @@
         webpackageDownloader.downloadWebpackages([ 'invalidWpId' ], targetDirectory, baseUrl)
           .catch(function (error) {
             expect(error.message).to.match(/Invalid WpId/);
+            expect(consoleSpy).to.be.calledOnce;
+            done();
+          });
+      });
+      it('should throw and log an error since targetDirectory is an invalid path', function (done) {
+        webpackageDownloader.downloadWebpackages(listOfWps, 'abc/*.js', baseUrl)
+          .catch(function (error) {
+            expect(error.message).to.match(/Invalid 'targetDirectory'/);
+            expect(consoleSpy).to.be.calledOnce;
+            done();
+          });
+      });
+      it('should throw and log an error since baseUrl is an invalid path', function (done) {
+        webpackageDownloader.downloadWebpackages(listOfWps, targetDirectory, 'invalid url')
+          .catch(function (error) {
+            expect(error.message).to.match(/Invalid 'baseUrl'/);
             expect(consoleSpy).to.be.calledOnce;
             done();
           });
