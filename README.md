@@ -24,7 +24,7 @@ cubx-webpackage-downloader -o <outputDirectory> -w <webpackagesIds> -b <baseUrl>
 
 ```javascript
 let baseUrl = 'http://base.example';
-let targetDirectory = 'path/to/my/local/directory'
+let targetDirectory = 'path/to/my/local/directory';
 let listOfWebpackages = [
                           "package1@1.0.0",
                           "package2@1.0.0"
