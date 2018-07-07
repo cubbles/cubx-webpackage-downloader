@@ -4,7 +4,7 @@ const commandLineArgs = require('command-line-args');
 const fs = require('fs-extra');
 
 let args = [
-  {name: 'targetDirectory', type: String, alias: 'o'},
+  {name: 'outputDirectory', type: String, alias: 'o'},
   {name: 'webpackagesIds', type: String, alias: 'w'},
   {name: 'baseUrl', type: String, alias: 'b'}
 ];
