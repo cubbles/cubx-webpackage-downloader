@@ -8,8 +8,17 @@ Module for downloading a list of webpackages.
 ### Command line: 
 
 ```
-cubx-webpackage-downloader -o <targetDirectory> -w <webpackagesIds> -b <baseUrl>
+cubx-webpackage-downloader -o <outputDirectory> -w <webpackagesIds> -b <baseUrl>
 ```
+
+#### Parameters
+
+* `-o` or `--outputDirectory`: local target directory for downloaded webpackage
+* `-w` or `webpackagesIds`: list of webpackages to be requested. Can be:
+  * Comma-separated list of webpackages 
+  * a reference to a .json file with a list of webpackages
+  * inline JSON list of webpackages
+* `-b` or `baseUrl`: base URL to use 
 
 ### Other npm modules
 
