@@ -19,7 +19,7 @@
       wpManifest = fs.readFileSync(path.join(webpackagesPath, 'wp', 'manifest.webpackage'), 'utf8');
       wpTwoManifest = fs.readFileSync(path.join(webpackagesPath, 'wp-two', 'manifest.webpackage'), 'utf8');
     });
-    describe('#_fetchManifest()', function () {
+    describe('#_fetchManifest', function () {
       let axiosStub;
       let webpackageId = 'my-wp@0.1.0-SNAPSHOT';
       before(function () {
@@ -51,7 +51,7 @@
         axiosStub.restore();
       });
     });
-    describe('#_saveManifest()', function () {
+    describe('#_saveManifest', function () {
       let _saveFileStub;
       let webpackageId = 'wp@0.1.0-SNAPSHOT';
       before(function () {
@@ -111,9 +111,10 @@
           });
       });
     });
-    describe('#_downloadArtifactFile()', function () {
+    describe('#_downloadArtifactFile', function () {
       let _saveFileStub;
       let axiosStub;
+      let _downloadHtmlExternalFilesStub;
       let consoleSpy;
       before(function () {
         webpackageDownloader = new WebpackageDownloader();
@@ -126,8 +127,9 @@
             setTimeout(function () {
               if (requestObject.url.indexOf('wrongUrl') > -1) {
                 reject(new Error('Error in axios request'));
+              } else {
+                resolve({data: wpManifest});
               }
-              resolve(wpManifest);
             }, 100);
           });
         });
@@ -136,8 +138,20 @@
             setTimeout(function () {
               if (targetPath.indexOf('wrongUrl') > -1) {
                 reject(new Error('Error in _saveFile'));
+              } else {
+                resolve();
               }
-              resolve();
+            }, 100);
+          });
+        });
+        _downloadHtmlExternalFilesStub = sinon.stub(webpackageDownloader, '_downloadHtmlExternalFiles').callsFake(function (htmlFileContent, artifactSourceUrl, artifactTargetPath, relativePath) {
+          return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+              if (relativePath.indexOf('wrongHtmlFile') > -1) {
+                reject(new Error('Error in _downloadHtmlExternalFiles'));
+              } else {
+                resolve();
+              }
             }, 100);
           });
         });
@@ -145,6 +159,7 @@
       afterEach(function () {
         consoleSpy.restore();
         _saveFileStub.restore();
+        _downloadHtmlExternalFilesStub.restore();
         axiosStub.restore();
       });
       it('should call _saveFile and axios request methods', function (done) {
@@ -158,12 +173,25 @@
             done();
           });
       });
+      it('should call _downloadHtmlExternalFiles since it is an html file', function (done) {
+        let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let relativePath = 'myDir/myFile.html';
+        webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
+          .then(function () {
+            expect(axiosStub.calledWith({url: artifactSourceUrl + '/' + relativePath, responseType: 'text'})).to.be.equal(true);
+            expect(_saveFileStub.calledWith(wpManifest, artifactTargetPath + '/' + relativePath)).to.be.equal(true);
+            expect(_downloadHtmlExternalFilesStub.calledWith(wpManifest, artifactSourceUrl, artifactTargetPath, relativePath)).to.be.equal(true);
+            done();
+          });
+      });
       it('should log and throw an error since axios request rejects', function (done) {
         let artifactSourceUrl = 'wrongUrl';
         let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'myDir/myFile.js';
         webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
-          .catch(function () {
+          .catch(function (error) {
+            expect(error.message).to.match(/Error in axios request/);
             expect(consoleSpy).to.be.calledOnce;
             done();
           });
@@ -173,13 +201,75 @@
         let artifactTargetPath = 'wrongUrl';
         let relativePath = 'myDir/myFile.js';
         webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
-          .catch(function () {
+          .catch(function (error) {
+            expect(error.message).to.match(/Error in _saveFile/);
+            expect(consoleSpy).to.be.calledOnce;
+            done();
+          });
+      });
+      it('should log and throw an error since _downloadHtmlExternalFiles rejects', function (done) {
+        let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let relativePath = 'myDir/wrongHtmlFile.html';
+        webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
+          .catch(function (error) {
+            expect(error.message).to.match(/Error in _downloadHtmlExternalFiles/);
             expect(consoleSpy).to.be.calledOnce;
             done();
           });
       });
     });
-    describe('#_downloadRunnable()', function () {
+    describe('#_downloadHtmlExternalFiles', function () {
+      let _downloadArtifactFileStub;
+      let consoleSpy;
+      let htmlContent;
+      before(function () {
+        htmlContent = fs.readFileSync(path.join(webpackagesPath, 'wp', 'my-elementary', 'demo', 'index.html'), 'utf8');
+        webpackageDownloader = new WebpackageDownloader();
+        webpackageDownloader.targetDirectory = targetDirectory;
+      });
+      beforeEach(function () {
+        consoleSpy = sinon.spy(console, 'error');
+        _downloadArtifactFileStub = sinon.stub(webpackageDownloader, '_downloadArtifactFile').callsFake(function (artifactSourceUrl, artifactTargetPath, relativePath) {
+          return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+              if (relativePath.indexOf('wrongHtmlFile') > -1) {
+                reject(new Error('Error in _downloadArtifactFile'));
+              } else {
+                resolve();
+              }
+            }, 100);
+          });
+        });
+      });
+      afterEach(function () {
+        consoleSpy.restore();
+        _downloadArtifactFileStub.restore();
+      });
+      it('should call _downloadArtifactFile only for local (own) files', function (done) {
+        let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let relativePath = 'myDir/myFile.html';
+        webpackageDownloader._downloadHtmlExternalFiles(htmlContent, artifactSourceUrl, artifactTargetPath, relativePath)
+          .then(function () {
+            expect(_downloadArtifactFileStub.calledWith(artifactSourceUrl, artifactTargetPath, 'myDir/style.css')).to.be.equal(true);
+            expect(_downloadArtifactFileStub.calledWith(artifactSourceUrl, artifactTargetPath, 'myDir/index.js')).to.be.equal(true);
+            done();
+          });
+      });
+      it('should log and throw an error since _downloadArtifactFile rejects', function (done) {
+        let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let relativePath = 'wrongHtmlFile/wrongHtmlFile.html';
+        webpackageDownloader._downloadHtmlExternalFiles(htmlContent, artifactSourceUrl, artifactTargetPath, relativePath)
+          .catch(function (error) {
+            expect(error.message).to.match(/Error in _downloadArtifactFile/);
+            expect(consoleSpy).to.be.calledOnce;
+            done();
+          });
+      });
+    });
+    describe('#_downloadRunnable', function () {
       let _downloadArtifactFileStub;
       let consoleSpy;
       before(function () {
@@ -222,7 +312,7 @@
           });
       });
     });
-    describe('#_downloadResource()', function () {
+    describe('#_downloadResource', function () {
       let _downloadArtifactFileStub;
       let consoleSpy;
       before(function () {
@@ -508,7 +598,7 @@
             expect(_fetchManifestStub).to.be.calledOnce;
             expect(_fetchManifestStub.calledWith(webpackageId)).to.be.equal(true);
             expect(_saveManifestStub).to.be.calledOnce;
-            expect(_saveManifestStub.calledWith(wpManifestJson, webpackageId)).to.be.equal(true);
+            expect(_saveManifestStub.calledWith(wpManifest, webpackageId)).to.be.equal(true);
             expect(_downloadArtifactsStub).to.have.callCount(4);
             expect(_downloadArtifactsStub.calledWith(artifacts.apps, webpackageId)).to.be.equal(true);
             expect(_downloadArtifactsStub.calledWith(artifacts.elementaryComponents, webpackageId)).to.be.equal(true);
