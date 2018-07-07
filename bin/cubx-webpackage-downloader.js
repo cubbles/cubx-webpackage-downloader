@@ -52,7 +52,7 @@ webpackageDownloader.downloadWebpackages(options.webpackagesIds, options.targetD
   .then(function () {
     console.log('\x1b[32m', 'Webpackages were downloaded successfully at %s.', options.targetDirectory);
   })
-  .catch(function (error) {
-    console.error('\x1b[31m', 'The webpackages could not be downloaded.', error);
+  .catch(function () {
+    console.error('\x1b[31m', 'The webpackages could not be downloaded.');
     process.exit(0);
   });
