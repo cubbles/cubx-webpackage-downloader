@@ -24,7 +24,7 @@ function parseWebpackagesIds (rootDeps) {
 let options = commandLineArgs(args);
 
 if (!options.webpackagesIds) {
-  console.error('Missed necessary parameter "baseUrl". Usage: cubx-webpackage-downloader -u <webpackagesIds>');
+  console.error('Missed necessary parameter "webpackagesIds". Usage: cubx-webpackage-downloader -u <webpackagesIds>');
   process.exit(0);
 } else {
   try {
@@ -37,8 +37,8 @@ if (!options.webpackagesIds) {
   }
 }
 
-if (!options.targetDirectory) {
-  console.error('Missed necessary parameter "baseUrl". Usage: cubx-webpackage-downloader -u <targetDirectory>');
+if (!options.outputDirectory) {
+  console.error('Missed necessary parameter "outputDirectory". Usage: cubx-webpackage-downloader -u <targetDirectory>');
   process.exit(0);
 }
 
