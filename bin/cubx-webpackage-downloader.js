@@ -48,9 +48,9 @@ if (!options.baseUrl) {
 }
 
 let webpackageDownloader = new WebpackageDownloader();
-webpackageDownloader.downloadWebpackages(options.webpackagesIds, options.targetDirectory, options.baseUrl)
+webpackageDownloader.downloadWebpackages(options.webpackagesIds, options.outputDirectory, options.baseUrl)
   .then(function () {
-    console.log('\x1b[32m', 'Webpackages were downloaded successfully at', options.targetDirectory);
+    console.log('\x1b[32m', 'Webpackages were downloaded successfully at', options.outputDirectory);
   })
   .catch(function () {
     console.error('\x1b[31m', 'The webpackages could not be downloaded.');
