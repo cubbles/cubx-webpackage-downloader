@@ -8,14 +8,14 @@
     const baseUrl = 'https://www.example.test/';
     const listOfWebpackages = [ 'wp@0.1.0-SNAPSHOT', 'wp-two@0.1.0' ];
     const resourcesPath = path.join(__dirname, '../resources');
-    const targetDirectory = path.join(resourcesPath, 'download');
+    const outputDirectory = path.join(resourcesPath, 'download');
     const webpackagesPath = path.join(resourcesPath, 'webpackages');
     let WebpackageDownloader = require('../../lib/cubx-webpackage-downloader.js');
     let webpackageDownloader;
     let wpManifest;
     let wpTwoManifest;
     before(function () {
-      fs.emptyDir(targetDirectory);
+      fs.emptyDir(outputDirectory);
       wpManifest = fs.readFileSync(path.join(webpackagesPath, 'wp', 'manifest.webpackage'), 'utf8');
       wpTwoManifest = fs.readFileSync(path.join(webpackagesPath, 'wp-two', 'manifest.webpackage'), 'utf8');
     });
@@ -56,7 +56,7 @@
       let webpackageId = 'wp@0.1.0-SNAPSHOT';
       before(function () {
         webpackageDownloader = new WebpackageDownloader();
-        webpackageDownloader.targetDirectory = targetDirectory;
+        webpackageDownloader.outputDirectory = outputDirectory;
         _saveFileStub = sinon.stub(webpackageDownloader, '_saveFile').callsFake(function (fileContent, targetPath) {
           return new Promise(function (resolve, reject) {
             setTimeout(function () {
@@ -67,7 +67,7 @@
       });
       it('should call _saveFile method with manifestContent and correctTargetPath', function () {
         webpackageDownloader._saveManifest(wpManifest, webpackageId);
-        expect(_saveFileStub.calledWith(wpManifest, path.join(targetDirectory, webpackageId, 'manifest.webpackage'))).to.be.equal(true);
+        expect(_saveFileStub.calledWith(wpManifest, path.join(outputDirectory, webpackageId, 'manifest.webpackage'))).to.be.equal(true);
       });
       after(function () {
         _saveFileStub.restore();
@@ -96,7 +96,7 @@
         consoleSpy.restore();
       });
       it('should save the content in the given url', function (done) {
-        let targetUrl = path.join(targetDirectory, 'savedFile', 'file.json');
+        let targetUrl = path.join(outputDirectory, 'savedFile', 'file.json');
         webpackageDownloader._saveFile(wpManifest, targetUrl)
           .then(function () {
             expect(fs.existsSync(targetUrl)).to.be.equal(true);
@@ -118,7 +118,7 @@
       let consoleSpy;
       before(function () {
         webpackageDownloader = new WebpackageDownloader();
-        webpackageDownloader.targetDirectory = targetDirectory;
+        webpackageDownloader.outputDirectory = outputDirectory;
       });
       beforeEach(function () {
         consoleSpy = sinon.spy(console, 'error');
@@ -164,7 +164,7 @@
       });
       it('should call _saveFile and axios request methods', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'myDir/myFile.js';
         webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
           .then(function () {
@@ -175,7 +175,7 @@
       });
       it('should call _downloadHtmlExternalFiles since it is an html file', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'myDir/myFile.html';
         webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
           .then(function () {
@@ -187,7 +187,7 @@
       });
       it('should log and throw an error since axios request rejects', function (done) {
         let artifactSourceUrl = 'wrongUrl';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'myDir/myFile.js';
         webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
           .catch(function (error) {
@@ -209,7 +209,7 @@
       });
       it('should log and throw an error since _downloadHtmlExternalFiles rejects', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'myDir/wrongHtmlFile.html';
         webpackageDownloader._downloadArtifactFile(artifactSourceUrl, artifactTargetPath, relativePath)
           .catch(function (error) {
@@ -226,7 +226,7 @@
       before(function () {
         htmlContent = fs.readFileSync(path.join(webpackagesPath, 'wp', 'my-elementary', 'demo', 'index.html'), 'utf8');
         webpackageDownloader = new WebpackageDownloader();
-        webpackageDownloader.targetDirectory = targetDirectory;
+        webpackageDownloader.outputDirectory = outputDirectory;
       });
       beforeEach(function () {
         consoleSpy = sinon.spy(console, 'error');
@@ -248,7 +248,7 @@
       });
       it('should call _downloadArtifactFile only for local (own) files', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'myDir/myFile.html';
         webpackageDownloader._downloadHtmlExternalFiles(htmlContent, artifactSourceUrl, artifactTargetPath, relativePath)
           .then(function () {
@@ -259,7 +259,7 @@
       });
       it('should log and throw an error since _downloadArtifactFile rejects', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let relativePath = 'wrongHtmlFile/wrongHtmlFile.html';
         webpackageDownloader._downloadHtmlExternalFiles(htmlContent, artifactSourceUrl, artifactTargetPath, relativePath)
           .catch(function (error) {
@@ -274,7 +274,7 @@
       let consoleSpy;
       before(function () {
         webpackageDownloader = new WebpackageDownloader();
-        webpackageDownloader.targetDirectory = targetDirectory;
+        webpackageDownloader.outputDirectory = outputDirectory;
       });
       beforeEach(function () {
         consoleSpy = sinon.spy(console, 'error');
@@ -293,7 +293,7 @@
       });
       it('should call _downloadArtifactFile method', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let runnable = { path: 'myDir/myFile.js' };
         webpackageDownloader._downloadRunnable(artifactSourceUrl, artifactTargetPath, runnable)
           .then(function () {
@@ -303,7 +303,7 @@
       });
       it('should throw an error since runnable path is not available', function (done) {
         let artifactSourceUrl = baseUrl + '/wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let runnable = 'myDir/myFile.js';
         webpackageDownloader._downloadRunnable(artifactSourceUrl, artifactTargetPath, runnable)
           .catch(function () {
@@ -338,7 +338,7 @@
       });
       it('should call _downloadArtifactFile method for a resource that is a string', function (done) {
         let artifactSourceUrl = baseUrl + 'wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let resource = '/my/resource.js';
         webpackageDownloader._downloadResource(artifactSourceUrl, artifactTargetPath, resource).then(function () {
           expect(_downloadArtifactFileStub.calledWith(artifactSourceUrl, artifactTargetPath, resource)).to.be.equal(true);
@@ -347,7 +347,7 @@
       });
       it('should call _downloadArtifactFile method for a resource that is an object', function (done) {
         let artifactSourceUrl = baseUrl + 'wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let resource = { dev: '/my/resource.js', prod: '/my/resource.min.js' };
         webpackageDownloader._downloadResource(artifactSourceUrl, artifactTargetPath, resource)
           .then(function () {
@@ -358,7 +358,7 @@
       });
       it('should throw and log an error since _downloadArtifactFile rejects', function (done) {
         let artifactSourceUrl = baseUrl + 'wp@1.0.0/my-artifact';
-        let artifactTargetPath = targetDirectory + '/wp@1.0.0/my-artifact';
+        let artifactTargetPath = outputDirectory + '/wp@1.0.0/my-artifact';
         let resource = 'invalidPath';
         webpackageDownloader._downloadResource(artifactSourceUrl, artifactTargetPath, resource)
           .catch(function (error) {
@@ -378,7 +378,7 @@
         wpManifestJson = JSON.parse(wpManifest);
         webpackageId = wpManifestJson.name + '@' + wpManifestJson.version;
         webpackageDownloader = new WebpackageDownloader();
-        webpackageDownloader.targetDirectory = targetDirectory;
+        webpackageDownloader.outputDirectory = outputDirectory;
         webpackageDownloader.baseUrl = baseUrl;
       });
       beforeEach(function () {
@@ -414,7 +414,7 @@
       it('should call _downloadRunnable and _downloadResource methods', function (done) {
         let artifact = wpManifestJson.artifacts.elementaryComponents[0];
         let artifactSourceUrl = baseUrl + webpackageId + '/' + artifact.artifactId;
-        let artifactTargetPath = targetDirectory + '/' + webpackageId + '/' + artifact.artifactId;
+        let artifactTargetPath = outputDirectory + '/' + webpackageId + '/' + artifact.artifactId;
         webpackageDownloader._downloadArtifact(artifact, webpackageId)
           .then(function () {
             expect(_downloadRunnableStub).to.have.callCount(2);
@@ -428,7 +428,7 @@
       it('should call _downloadRunnable but not _downloadResource', function (done) {
         let artifact = wpManifestJson.artifacts.apps[0];
         let artifactSourceUrl = baseUrl + webpackageId + '/' + artifact.artifactId;
-        let artifactTargetPath = targetDirectory + '/' + webpackageId + '/' + artifact.artifactId;
+        let artifactTargetPath = outputDirectory + '/' + webpackageId + '/' + artifact.artifactId;
         webpackageDownloader._downloadArtifact(artifact, webpackageId)
           .then(function () {
             expect(_downloadResourceStub).to.have.callCount(0);
@@ -440,7 +440,7 @@
       it('should call _downloadResource but not _downloadRunnable', function (done) {
         let artifact = wpManifestJson.artifacts.utilities[0];
         let artifactSourceUrl = baseUrl + webpackageId + '/' + artifact.artifactId;
-        let artifactTargetPath = targetDirectory + '/' + webpackageId + '/' + artifact.artifactId;
+        let artifactTargetPath = outputDirectory + '/' + webpackageId + '/' + artifact.artifactId;
         webpackageDownloader._downloadArtifact(artifact, webpackageId)
           .then(function () {
             expect(_downloadRunnableStub).to.have.callCount(0);
@@ -461,7 +461,7 @@
       });
       it('should throw and log an error since _downloadResource rejects', function (done) {
         let artifact = wpManifestJson.artifacts.elementaryComponents[0];
-        webpackageDownloader.targetDirectory = 'invalidPath';
+        webpackageDownloader.outputDirectory = 'invalidPath';
         webpackageDownloader._downloadArtifact(artifact, webpackageId)
           .catch(function (error) {
             expect(error.message).to.match(/Invalid path/);
@@ -682,9 +682,9 @@
         consoleSpy.restore();
       });
       it('should call _isValidListOfWebpackages and _downloadWebpackage and initialisation should be right', function (done) {
-        webpackageDownloader.downloadWebpackages(listOfWps, targetDirectory, baseUrl)
+        webpackageDownloader.downloadWebpackages(listOfWps, outputDirectory, baseUrl)
           .then(function () {
-            expect(webpackageDownloader.targetDirectory).to.be.equal(targetDirectory);
+            expect(webpackageDownloader.outputDirectory).to.be.equal(outputDirectory);
             expect(webpackageDownloader.baseUrl).to.be.equal(baseUrl);
             expect(webpackageDownloader._webpackageDownloadsQeue.length).to.be.equal(2);
             expect(_isValidListOfWebpackagesStub).to.be.calledOnce;
@@ -696,7 +696,7 @@
           });
       });
       it('should throw and log an error since _isValidListOfWebpackages returns false', function (done) {
-        webpackageDownloader.downloadWebpackages('invalidList', targetDirectory, baseUrl)
+        webpackageDownloader.downloadWebpackages('invalidList', outputDirectory, baseUrl)
           .catch(function (error) {
             expect(error.message).to.match(/Invalid 'listOfWebpackages'/);
             expect(consoleSpy).to.be.calledOnce;
@@ -704,23 +704,23 @@
           });
       });
       it('should throw and log an error since _downloadWebpackage rejects', function (done) {
-        webpackageDownloader.downloadWebpackages([ 'invalidWpId' ], targetDirectory, baseUrl)
+        webpackageDownloader.downloadWebpackages([ 'invalidWpId' ], outputDirectory, baseUrl)
           .catch(function (error) {
             expect(error.message).to.match(/Invalid WpId/);
             expect(consoleSpy).to.be.calledOnce;
             done();
           });
       });
-      it('should throw and log an error since targetDirectory is an invalid path', function (done) {
+      it('should throw and log an error since outputDirectory is an invalid path', function (done) {
         webpackageDownloader.downloadWebpackages(listOfWps, 'abc/*.js', baseUrl)
           .catch(function (error) {
-            expect(error.message).to.match(/Invalid 'targetDirectory'/);
+            expect(error.message).to.match(/Invalid 'outputDirectory'/);
             expect(consoleSpy).to.be.calledOnce;
             done();
           });
       });
       it('should throw and log an error since baseUrl is an invalid path', function (done) {
-        webpackageDownloader.downloadWebpackages(listOfWps, targetDirectory, 'invalid url')
+        webpackageDownloader.downloadWebpackages(listOfWps, outputDirectory, 'invalid url')
           .catch(function (error) {
             expect(error.message).to.match(/Invalid 'baseUrl'/);
             expect(consoleSpy).to.be.calledOnce;

@@ -38,7 +38,7 @@ if (!options.webpackagesIds) {
 }
 
 if (!options.outputDirectory) {
-  console.error('Missed necessary parameter "outputDirectory". Usage: cubx-webpackage-downloader -u <targetDirectory>');
+  console.error('Missed necessary parameter "outputDirectory". Usage: cubx-webpackage-downloader -u <outputDirectory>');
   process.exit(0);
 }
 

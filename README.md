@@ -24,7 +24,7 @@ cubx-webpackage-downloader -o <outputDirectory> -w <webpackagesIds> -b <baseUrl>
 
 ```javascript
 let baseUrl = 'http://base.example';
-let targetDirectory = 'path/to/my/local/directory';
+let outputDirectory = 'path/to/my/local/directory';
 let listOfWebpackages = [
                           "package1@1.0.0",
                           "package2@1.0.0"
@@ -32,9 +32,9 @@ let listOfWebpackages = [
 
 let WebpackageDownloader = require('cubx-webpackage-downloader');
 let webpackageDownloader = new WebpackageDownloader();
-webpackageDownloader.downloadWebpackages(listOfWebpackages, targetDirectory, baseUrl)
+webpackageDownloader.downloadWebpackages(listOfWebpackages, outputDirectory, baseUrl)
   .then(function () {
-    console.log('Webpackages were downloaded successfully at', options.targetDirectory);
+    console.log('Webpackages were downloaded successfully at', options.outputDirectory);
   })
   .catch(function (error) {
     console.error('The webpackages could not be downloaded.', error);
