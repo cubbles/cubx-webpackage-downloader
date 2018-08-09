@@ -1,0 +1,57 @@
+{
+  "name": "wp",
+  "groupId": "",
+  "version": "0.1.0",
+  "modelVersion": "9.1.1",
+  "docType": "webpackage",
+  "author": {
+    "name": "Edwin Gamboa",
+    "email": "edwingamboa355@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": [],
+  "man": [],
+  "artifacts": {
+    "apps": [],
+    "elementaryComponents": [
+      {
+        "artifactId": "my-elementary",
+        "description": "This is an elementary-component based on Polymer.",
+        "runnables": [
+          {
+            "name": "demo",
+            "path": "/demo/index.html",
+            "description": "Demo app..."
+          },
+          {
+            "name": "docs",
+            "path": "/docs/index.html",
+            "description": "Show the interface of this component."
+          }
+        ],
+        "resources": [
+          "my-elementary.html"
+        ],
+        "dependencies": [
+          {
+            "webpackageId": "cubx.core.rte@3.0.0",
+            "artifactId": "cubxpolymer"
+          }
+        ],
+        "slots": [
+          {
+            "slotId": "a",
+            "type": "number",
+            "direction": [
+              "input",
+              "output"
+            ],
+            "value": 10
+          }
+        ]
+      }
+    ],
+    "compoundComponents": [],
+    "utilities": []
+  }
+}

@@ -2,9 +2,14 @@
   "name": "cubx-webpackage-downloader",
   "version": "1.0.0",
   "description": "Downloads a list of cubbles webpackages",
-  "main": "cubx-webpackage-downloader.js",
+  "main": "lib/cubx-webpackage-downloader.js",
+  "bin": {
+    "cubx-webpackage-downloader": "./bin/cubx-webpackage-downloader.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublish": "npm run-script lint",
+    "lint": "eslint lib/**/*.js bin/**/*.js test/unit/**/*.js *.js",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -22,5 +27,31 @@
   "bugs": {
     "url": "https://github.com/cubbles/cubx-webpackage-downloader/issues"
   },
-  "homepage": "https://github.com/cubbles/cubx-webpackage-downloader#readme"
+  "homepage": "https://github.com/cubbles/cubx-webpackage-downloader#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "grunt": "^1.0.3",
+    "grunt-githooks": "^0.6.0",
+    "grunt-shell": "^2.1.0",
+    "load-grunt-configs": "^1.0.0",
+    "load-grunt-tasks": "^4.0.0",
+    "mocha": "^5.2.0",
+    "sinon": "^6.0.0",
+    "sinon-chai": "^3.2.0",
+    "time-grunt": "^1.4.0"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "command-line-args": "^5.0.2",
+    "fs-extra": "^6.0.1",
+    "is-valid-path": "^0.1.1",
+    "path": "^0.12.7",
+    "valid-url": "^1.0.9"
+  }
 }
